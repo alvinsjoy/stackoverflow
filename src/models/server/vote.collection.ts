@@ -30,5 +30,5 @@ export default async function createVoteCollection() {
     ),
     databases.createStringAttribute(db, voteCollection, 'votedById', 50, true),
   ]);
-  console.log('Vote cttributes created');
+  console.log('Vote attributes created');
 }
