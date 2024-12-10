@@ -6,7 +6,6 @@ import { AppwriteException, ID, Models } from 'appwrite';
 import { account } from '@/models/client/config';
 
 export interface UserPrefs {
-  theme: 'light' | 'dark' | 'system';
   reputation: number;
 }
 
