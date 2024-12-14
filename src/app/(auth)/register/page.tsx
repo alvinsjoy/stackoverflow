@@ -8,6 +8,7 @@ import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
 import { useAuthStore } from '@/store/Auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { AuthWrapper } from '@/components/auth/auth-wrapper';
 
 const BottomGradient = () => {
   return (
@@ -32,7 +33,7 @@ const LabelInputContainer = ({
   );
 };
 
-export default function Register() {
+function RegisterPage() {
   const { login, createAccount, verifyEmail } = useAuthStore();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
@@ -103,6 +104,7 @@ export default function Register() {
           {error}
         </p>
       )}
+
       <form className="my-8" onSubmit={handleSubmit}>
         <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-x-2 md:space-y-0">
           <LabelInputContainer>
@@ -113,6 +115,7 @@ export default function Register() {
               name="firstname"
               placeholder="John"
               type="text"
+              disabled={isLoading}
             />
           </LabelInputContainer>
           <LabelInputContainer>
@@ -123,6 +126,7 @@ export default function Register() {
               name="lastname"
               placeholder="Doe"
               type="text"
+              disabled={isLoading}
             />
           </LabelInputContainer>
         </div>
@@ -134,6 +138,7 @@ export default function Register() {
             name="email"
             placeholder="john@example.com"
             type="email"
+            disabled={isLoading}
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
@@ -144,6 +149,7 @@ export default function Register() {
             name="password"
             placeholder="••••••••"
             type="password"
+            disabled={isLoading}
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
@@ -154,6 +160,7 @@ export default function Register() {
             name="password2"
             placeholder="••••••••"
             type="password"
+            disabled={isLoading}
           />
         </LabelInputContainer>
 
@@ -194,5 +201,13 @@ export default function Register() {
         </div>
       </form>
     </div>
+  );
+}
+
+export default function Register() {
+  return (
+    <AuthWrapper requireUnauth>
+      <RegisterPage />
+    </AuthWrapper>
   );
 }
