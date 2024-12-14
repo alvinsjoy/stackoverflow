@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
 import { useAuthStore } from '@/store/Auth';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const BottomGradient = () => {
   return (
@@ -35,6 +36,7 @@ export default function Login() {
   const { login } = useAuthStore();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,19 +46,22 @@ export default function Login() {
     const password = formData.get('password');
 
     if (!email || !password) {
-      setError(() => 'Please fill out all fields');
+      setError('Please fill out all fields');
       return;
     }
 
-    setIsLoading(() => true);
-    setError(() => '');
+    setIsLoading(true);
+    setError('');
 
     const loginResponse = await login(email.toString(), password.toString());
-    if (loginResponse.error) {
-      setError(() => loginResponse.error!.message);
-    }
 
-    setIsLoading(() => false);
+    if (loginResponse.error) {
+      setError(loginResponse.error.message);
+      setIsLoading(false);
+      return;
+    }
+    router.push('/');
+    setIsLoading(false);
   };
 
   return (
@@ -78,25 +83,28 @@ export default function Login() {
           {error}
         </p>
       )}
+
       <form className="my-8" onSubmit={handleSubmit}>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email</Label>
           <Input
-            className="text-black"
+            className="text-black dark:text-white"
             id="email"
             name="email"
             placeholder="john@example.com"
             type="email"
+            disabled={isLoading}
           />
         </LabelInputContainer>
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
           <Input
-            className="text-black"
+            className="text-black dark:text-white"
             id="password"
             name="password"
             placeholder="••••••••"
             type="password"
+            disabled={isLoading}
           />
         </LabelInputContainer>
 
@@ -105,7 +113,7 @@ export default function Login() {
           type="submit"
           disabled={isLoading}
         >
-          Log in &rarr;
+          {isLoading ? 'Processing...' : 'Log in →'}
           <BottomGradient />
         </button>
 

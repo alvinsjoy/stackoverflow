@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
 import { useAuthStore } from '@/store/Auth';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const BottomGradient = () => {
   return (
@@ -32,9 +33,10 @@ const LabelInputContainer = ({
 };
 
 export default function Register() {
-  const { login, createAccount } = useAuthStore();
+  const { login, createAccount, verifyEmail } = useAuthStore();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,16 +49,16 @@ export default function Register() {
     const password2 = formData.get('password2');
 
     if (!firstname || !lastname || !email || !password || !password2) {
-      setError(() => 'Please fill out all fields');
+      setError('Please fill out all fields');
       return;
     }
     if (password !== password2) {
-      setError(() => 'Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
-    setIsLoading(() => true);
-    setError(() => '');
+    setIsLoading(true);
+    setError('');
 
     const response = await createAccount(
       `${firstname} ${lastname}`,
@@ -65,15 +67,21 @@ export default function Register() {
     );
 
     if (response.error) {
-      setError(() => response.error!.message);
-    } else {
-      const loginResponse = await login(email.toString(), password.toString());
-      if (loginResponse.error) {
-        setError(() => loginResponse.error!.message);
-      }
+      setError(response.error.message);
+      setIsLoading(false);
+      return;
     }
 
-    setIsLoading(() => false);
+    const loginResponse = await login(email.toString(), password.toString());
+    if (loginResponse.error) {
+      setError(loginResponse.error.message);
+      setIsLoading(false);
+      return;
+    }
+    await verifyEmail();
+    router.push('/verify?emailSent=true');
+
+    setIsLoading(false);
   };
 
   return (
@@ -82,7 +90,7 @@ export default function Register() {
         Welcome to StackUnderflow
       </h2>
       <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300">
-        Signup with StackUnderflow if you you don&apos;t have an account.
+        Signup with StackUnderflow if you don&apos;t have an account.
         <br /> If you already have an account,{' '}
         <Link href="/login" className="text-orange-500 hover:underline">
           login
@@ -100,7 +108,7 @@ export default function Register() {
           <LabelInputContainer>
             <Label htmlFor="firstname">First name</Label>
             <Input
-              className="text-black"
+              className="text-black dark:text-white"
               id="firstname"
               name="firstname"
               placeholder="John"
@@ -110,7 +118,7 @@ export default function Register() {
           <LabelInputContainer>
             <Label htmlFor="lastname">Last name</Label>
             <Input
-              className="text-black"
+              className="text-black dark:text-white"
               id="lastname"
               name="lastname"
               placeholder="Doe"
@@ -121,7 +129,7 @@ export default function Register() {
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email</Label>
           <Input
-            className="text-black"
+            className="text-black dark:text-white"
             id="email"
             name="email"
             placeholder="john@example.com"
@@ -131,7 +139,7 @@ export default function Register() {
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
           <Input
-            className="text-black"
+            className="text-black dark:text-white"
             id="password"
             name="password"
             placeholder="••••••••"
@@ -141,7 +149,7 @@ export default function Register() {
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password2">Confirm Password</Label>
           <Input
-            className="text-black"
+            className="text-black dark:text-white"
             id="password2"
             name="password2"
             placeholder="••••••••"
@@ -154,7 +162,7 @@ export default function Register() {
           type="submit"
           disabled={isLoading}
         >
-          Sign up &rarr;
+          {isLoading ? 'Processing...' : 'Sign up →'}
           <BottomGradient />
         </button>
 
