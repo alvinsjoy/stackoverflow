@@ -32,6 +32,10 @@ interface IAuthStore {
     success: boolean;
     error?: AppwriteException | null;
   }>;
+  verifyEmail(): Promise<{
+    success: boolean;
+    error?: AppwriteException | null;
+  }>;
   logout(): Promise<void>;
 }
 
@@ -96,9 +100,22 @@ export const useAuthStore = create<IAuthStore>()(
         }
       },
 
+      async verifyEmail() {
+        try {
+          await account.createVerification(`${window.location.origin}/verify`);
+          return { success: true };
+        } catch (error) {
+          console.log(error);
+          return {
+            success: false,
+            error: error instanceof AppwriteException ? error : null,
+          };
+        }
+      },
+
       async logout() {
         try {
-          await account.deleteSessions();
+          await account.deleteSession('current');
           set({ session: null, jwt: null, user: null });
         } catch (error) {
           console.log(error);
