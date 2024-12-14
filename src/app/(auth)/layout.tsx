@@ -3,7 +3,7 @@
 import { BackgroundBeams } from '@/components/ui/background-beams';
 import { useAuthStore } from '@/store/Auth';
 import { useRouter } from 'next/navigation';
-import Providers from '@/components/provider';
+import Providers from '../provider';
 import React from 'react';
 import ThemeSwitch from '@/components/theme-switch';
 
@@ -20,11 +20,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Providers>
       <div className="relative flex min-h-screen flex-col items-center justify-center py-12">
-        {/* ThemeSwitch in the top-right corner */}
-        <div className="absolute right-4 top-4 z-50">
-          <ThemeSwitch />
-        </div>
-
+        <ThemeSwitch />
         <BackgroundBeams />
         <div className="relative">{children}</div>
       </div>
