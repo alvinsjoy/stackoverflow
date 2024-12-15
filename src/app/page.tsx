@@ -1,11 +1,13 @@
 'use client';
 import Image from 'next/image';
 import { useAuth } from '@/hooks/useAuth';
+import { useRequireVerified } from '@/hooks/useRequireVerified';
 
 export default function Home() {
   const { isLoading, user } = useAuth({ requireAuth: true });
+  const { isChecking } = useRequireVerified();
 
-  if (isLoading) {
+  if (isLoading || isChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-lg">Loading...</div>
