@@ -8,6 +8,7 @@ import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
 import { useAuthStore } from '@/store/Auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 const BottomGradient = () => {
   return (
@@ -33,16 +34,20 @@ const LabelInputContainer = ({
 };
 
 export default function Login() {
-  const { login, user } = useAuthStore();
+  const { login } = useAuthStore();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
   const router = useRouter();
+  const { isLoading: isAuthChecking } = useAuth({ requireUnauth: true });
 
-  React.useEffect(() => {
-    if (user) {
-      router.push('/');
-    }
-  }, [router, user]);
+  if (isAuthChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 

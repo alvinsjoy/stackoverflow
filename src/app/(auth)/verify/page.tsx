@@ -1,9 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useAuthStore } from '@/store/Auth';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { account } from '@/models/client/config';
+import { useAuth } from '@/hooks/useAuth';
+import { useVerifyEmail } from '@/hooks/useVerifyEmail';
 
 const BottomGradient = () => {
   return (
@@ -15,63 +14,17 @@ const BottomGradient = () => {
 };
 
 export default function VerifyEmail() {
-  const { verifyEmail, user } = useAuthStore();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState('');
-  const [message, setMessage] = React.useState('');
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const { isLoading: isAuthChecking } = useAuth({ requireAuth: true });
+  const { isLoading, error, message, handleResendVerification } =
+    useVerifyEmail();
 
-  React.useEffect(() => {
-    if (!user) {
-      return router.push('/login');
-    }
-    if (user && user.emailVerification) {
-      return router.push('/');
-    }
-    const emailSent = searchParams.get('emailSent');
-    if (emailSent === 'true') {
-      setMessage('Verification email has been sent! Please check your inbox.');
-    }
-
-    const secret = searchParams.get('secret');
-    const userId = searchParams.get('userId');
-
-    if (secret && userId) {
-      setIsLoading(true);
-      account
-        .updateVerification(userId, secret)
-        .then(() => {
-          setMessage('Email verified successfully! Redirecting...');
-          setTimeout(() => {
-            router.push('/');
-          }, 2000);
-        })
-        .catch((error) => {
-          console.log(error);
-          setError('Failed to verify email. Please try again.');
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  }, [searchParams, router, user, user?.emailVerification]);
-
-  const handleResendVerification = async () => {
-    setIsLoading(true);
-    setError('');
-    setMessage('');
-
-    const response = await verifyEmail();
-
-    if (response.success) {
-      setMessage('Verification email sent! Please check your inbox.');
-    } else {
-      setError(response.error?.message || 'Failed to send verification email');
-    }
-
-    setIsLoading(false);
-  };
+  if (isAuthChecking || isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-md rounded-none bg-white p-4 shadow-input dark:bg-black md:rounded-2xl md:p-8">
