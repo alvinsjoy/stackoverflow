@@ -8,7 +8,6 @@ import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
 import { useAuthStore } from '@/store/Auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { AuthWrapper } from '@/components/auth/auth-wrapper';
 
 const BottomGradient = () => {
   return (
@@ -33,12 +32,17 @@ const LabelInputContainer = ({
   );
 };
 
-function LoginPage() {
-  const { login } = useAuthStore();
+export default function Login() {
+  const { login, user } = useAuthStore();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
   const router = useRouter();
 
+  React.useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [router, user]);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -146,13 +150,5 @@ function LoginPage() {
         </div>
       </form>
     </div>
-  );
-}
-
-export default function Login() {
-  return (
-    <AuthWrapper requireUnauth>
-      <LoginPage />
-    </AuthWrapper>
   );
 }

@@ -23,9 +23,11 @@ export default function VerifyEmail() {
   const searchParams = useSearchParams();
 
   React.useEffect(() => {
-    if (user?.emailVerification) {
-      router.push('/');
-      return;
+    if (!user) {
+      return router.push('/login');
+    }
+    if (user && user.emailVerification) {
+      return router.push('/');
     }
     const emailSent = searchParams.get('emailSent');
     if (emailSent === 'true') {
@@ -53,7 +55,7 @@ export default function VerifyEmail() {
           setIsLoading(false);
         });
     }
-  }, [searchParams, router, user?.emailVerification]);
+  }, [searchParams, router, user, user?.emailVerification]);
 
   const handleResendVerification = async () => {
     setIsLoading(true);
