@@ -6,13 +6,11 @@ import { useAuthStore } from '@/store/Auth';
 
 interface UseAuthOptions {
   requireAuth?: boolean;
-  redirectTo?: string;
   requireUnauth?: boolean;
 }
 
 export function useAuth({
   requireAuth = false,
-  redirectTo = '/login',
   requireUnauth = false,
 }: UseAuthOptions = {}) {
   const router = useRouter();
@@ -34,19 +32,11 @@ export function useAuth({
     if (isLoading || !hydrated) return;
 
     if (requireAuth && !user) {
-      router.push(redirectTo);
+      router.push('/login');
     } else if (requireUnauth && user) {
       router.push('/');
     }
-  }, [
-    router,
-    user,
-    isLoading,
-    hydrated,
-    requireAuth,
-    requireUnauth,
-    redirectTo,
-  ]);
+  }, [router, user, isLoading, hydrated, requireAuth, requireUnauth]);
 
   return {
     isLoading: isLoading || !hydrated,
